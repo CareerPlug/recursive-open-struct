@@ -103,7 +103,7 @@ class RecursiveOpenStruct < OpenStruct
   # Makes sure ROS responds as expected on #respond_to? and #method requests
   def respond_to_missing?(mid, include_private = false)
     mname = _get_key_from_table_(mid.to_s.chomp('=').chomp('_as_a_hash'))
-    @table.key?(mname) || super
+    @table&.key?(mname) || super
   end
 
   # Adapted implementation of method_missing to accommodate the differences
@@ -179,8 +179,8 @@ class RecursiveOpenStruct < OpenStruct
   end
 
   def _get_key_from_table_(name)
-    return name.to_s if @table.has_key?(name.to_s)
-    return name.to_sym if @table.has_key?(name.to_sym)
+    return name.to_s if @table&.has_key?(name.to_s)
+    return name.to_sym if @table&.has_key?(name.to_sym)
     name
   end
 
