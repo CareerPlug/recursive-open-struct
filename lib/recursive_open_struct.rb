@@ -27,24 +27,6 @@ class RecursiveOpenStruct < OpenStruct
     }
   end
 
-  def init_with coder
-    if coder&.map&.present?
-      hash = coder.map["table"] || {}
-
-      @options = self.class.default_options.merge!({
-          mutate_input_hash: coder.map["mutate_input_hash"] || false,
-          recurse_over_arrays: coder.map["recurse_over_arrays"] || false,
-          preserve_original_keys: coder.map["preserve_original_keys"] || false
-        }).freeze
-
-      @deep_dup = DeepDup.new(@options)
-
-      @table = @options[:mutate_input_hash] ? hash : @deep_dup.call(hash)
-
-      @sub_elements = {}
-    end
-  end
-
   def initialize(hash=nil, passed_options={})
     hash ||= {}
 
@@ -120,6 +102,7 @@ class RecursiveOpenStruct < OpenStruct
 
   # Makes sure ROS responds as expected on #respond_to? and #method requests
   def respond_to_missing?(mid, include_private = false)
+    if @table.nil? return super
     mname = _get_key_from_table_(mid.to_s.chomp('=').chomp('_as_a_hash'))
     @table.key?(mname) || super
   end
