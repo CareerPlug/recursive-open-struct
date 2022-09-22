@@ -30,12 +30,14 @@ class RecursiveOpenStruct < OpenStruct
   def init_with coder
     if coder&.map&.present?
       hash = coder.map["table"] || {}
-
-      @options = self.class.default_options.merge!({
+      opts = coder.map["options"] ||
+        {
           mutate_input_hash: coder.map["mutate_input_hash"] || false,
           recurse_over_arrays: coder.map["recurse_over_arrays"] || false,
           preserve_original_keys: coder.map["preserve_original_keys"] || false
-        }).freeze
+        }
+
+      @options = self.class.default_options.merge!(opts).freeze
 
       @deep_dup = DeepDup.new(@options)
 
